@@ -26,6 +26,13 @@ var TestLayer = cc.Layer.extend({
 
     ctor: function() {
         this._super();
+
+        this.background_image = new cc.Sprite(res.Background_tutorial_img);
+        this.background_image.setPosition(cc.p(
+            cc.winSize.width / 2,
+            cc.winSize.height / 2
+            ));
+        this.addChild(this.background_image);
     },
 
 });
@@ -44,7 +51,8 @@ var PonyInvandersMainLayer = cc.Layer.extend({
     hud_elements: {
         gameover_text: null,
         gameover_panel: null,
-        restart_btn: null
+        restart_btn: null,
+        tutorial_image: null
     },
 
     pony_state: {
@@ -53,7 +61,9 @@ var PonyInvandersMainLayer = cc.Layer.extend({
     },
 
     game_state: {
-        running: true,
+        running: false,
+        tutorial: true,
+        gameover: false,
         display_defeat: false,
         score_display: null,
         score: 0,
@@ -147,6 +157,26 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         sprite.runAction(animate_loop);
     },
 
+    DisplayTutorial: function() {
+        var tutorial_image = new ccui.ImageView();
+        tutorial_image.loadTexture(res.Background_tutorial_img);
+        tutorial_image.setPosition(cc.p(
+            cc.winSize.width / 2,
+            cc.winSize.height / 2
+            ));
+        tutorial_image.addTouchEventListener(this.HideTutorial, this);
+        tutorial_image.setTouchEnabled(true);
+        this.addChild(tutorial_image, 20);
+        this.hud_elements.tutorial_image = tutorial_image;
+    },
+
+    HideTutorial: function() {
+        this.removeChild(this.hud_elements.tutorial_image);
+        this.hud_elements.tutorial_image = null;
+        this.game_state.tutorial = false;
+        this.game_state.running = true;
+    },
+
     DisplayGameover: function() {
         var text = new ccui.Text();
         text.attr({
@@ -222,6 +252,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         this.projectile_sprites = [];
         this.cigans = [];
         this.game_state.running = true;
+        this.game_state.gameover = false;
         this.game_state.display_defeat = false;
         this.game_state.score = 0;
         this.game_state.game_speed = 1;
@@ -303,6 +334,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         */
         this.PlayBackgroundMusic();
         this.CreateScoreDisplay();
+        this.DisplayTutorial();
 
         this.scheduleUpdate();
         this.schedule(this.SpawnEnemy, 1);
@@ -363,10 +395,11 @@ var PonyInvandersMainLayer = cc.Layer.extend({
                 this.chrysalis_sprites[i].x -= 100 * this.game_state.game_speed * dt;
                 if (this.chrysalis_sprites[i].x <= 0) {
                     this.game_state.running = false;
+                    this.game_state.gameover = true;
                 };
             }
         }
-        else {
+        if (this.game_state.gameover == true) {
             if (!this.game_state.display_defeat) {
                 this.DisplayGameover();
             };

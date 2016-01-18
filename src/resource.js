@@ -3,6 +3,7 @@ var res = {
     Enemy_img : "res/Chrysalis.png",
     Projectile_gif : "res/Cigan.png",
     Background_img : "res/Background.png",
+    Background_tutorial_img : "res/Background_tutorial.png",
     Background_music : "res/Cigan.mp3",
     Cigan_frames : "res/CiganAnimated.png",
     Score_panel : "res/Score_panel.png",
