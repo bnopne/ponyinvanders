@@ -43,6 +43,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
 
     hud_elements: {
         gameover_text: null,
+        gameover_panel: null,
         restart_btn: null
     },
 
@@ -79,6 +80,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         new_projectile_sprite.setPosition(x, y);
         this.addChild(new_projectile_sprite);
         this.projectile_sprites.push(new_projectile_sprite);
+        cc.audioEngine.playEffect(res.Shot_sound);
     },
 
     SpawnEnemy: function() {
@@ -154,19 +156,25 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         text.attr({
             textAlign: cc.TEXT_ALIGNMENT_CENTER,
             fontSize: 72,
-            string: "ИГРА ОКОНЧЕНА",
+            string: "ЗАНОВО ",
             x: cc.winSize.width / 2,
             y: cc.winSize.height / 2
         });
         this.hud_elements.gameover_text = text;
-        this.addChild(text);
+
+        var panel = new cc.Sprite(res.Gameover_panel);
+        panel.setPosition(cc.p(cc.winSize.width / 2, cc.winSize.height / 2));
+        this.hud_elements.gameover_panel = panel;
+
+        this.addChild(panel, 10);
+        this.addChild(text, 11);
 
         var restart_btn = new ccui.Button();
         restart_btn.loadTextures(res.Restart_btn_normal, res.Restart_btn_clicked);
-        restart_btn.setPosition(cc.p(cc.winSize.width / 2, cc.winSize.height / 2));
+        restart_btn.setPosition(cc.p((cc.winSize.width / 2) + (cc.winSize.height * 0.3), cc.winSize.height / 2));
         restart_btn.addTouchEventListener(this.RestartGame, this);
         this.hud_elements.restart_btn = restart_btn;
-        this.addChild(restart_btn);
+        this.addChild(restart_btn, 11);
 
         this.game_state.display_defeat = true;
     },
@@ -181,11 +189,11 @@ var PonyInvandersMainLayer = cc.Layer.extend({
             fontSize: 52,
             string: "СЧЕТ: " + this.game_state.score.toString(),
             x: cc.winSize.width / 2,
-            y: cc.winSize.height * 0.075
+            y: cc.winSize.height * 0.1
         });
 
-        this.addChild(score_panel);
-        this.addChild(score);
+        this.addChild(score_panel, 10);
+        this.addChild(score, 10);
         this.game_state.score_display = {
             panel: score_panel,
             score: score
@@ -198,7 +206,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
             fontSize: 52,
             string: "СЧЕТ: " + this.game_state.score.toString(),
             x: cc.winSize.width / 2,
-            y: cc.winSize.height * 0.075
+            y: cc.winSize.height * 0.1
         });
         cc.audioEngine.setMusicVolume(this.game_state.score / 1000.0);
     },
@@ -223,7 +231,9 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         this.game_state.game_speed = 1;
         this.UpdateScoreDisplay();
         this.removeChild(this.hud_elements.gameover_text);
+        this.removeChild(this.hud_elements.gameover_panel);
         this.removeChild(this.hud_elements.restart_btn);
+        cc.audioEngine.playEffect(res.Button_press);
     },
 
     KeyPressedHandler: function(key, event) {
@@ -269,8 +279,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
             LOAD SPRITES
         */
         this.fluttershy_sprite = new cc.Sprite(res.Player_img);
-        this.fluttershy_sprite.setAnchorPoint(cc.p(0.5, 0.5));
-        this.fluttershy_sprite.setPosition(cc.p(50, cc.winSize.height / 2));
+        this.fluttershy_sprite.setPosition(cc.p(150, cc.winSize.height / 2));
         this.addChild(this.fluttershy_sprite);
 
         /*
@@ -335,6 +344,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
                                 this.chrysalis_sprites[j].x,
                                 this.chrysalis_sprites[j].y
                                 );
+                            cc.audioEngine.playEffect(res.Hit_sound);
                             this.removeChild(this.chrysalis_sprites[j]);
                             this.game_state.score += 10;
                             this.game_state.game_speed += 0.1;
