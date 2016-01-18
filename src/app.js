@@ -147,10 +147,6 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         sprite.runAction(animate_loop);
     },
 
-    DisplayRestart: function() {
-
-    },
-
     DisplayGameover: function() {
         var text = new ccui.Text();
         text.attr({
