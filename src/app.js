@@ -4,6 +4,7 @@
 
 */
 
+
 var PonyInvandersBackgroundLayer = cc.Layer.extend({
 
     background_image: null,
@@ -175,6 +176,7 @@ var PonyInvandersMainLayer = cc.Layer.extend({
         this.hud_elements.tutorial_image = null;
         this.game_state.tutorial = false;
         this.game_state.running = true;
+        this.SetMouseRunningHandlers();
     },
 
     DisplayGameover: function() {
@@ -291,6 +293,45 @@ var PonyInvandersMainLayer = cc.Layer.extend({
                             }
                         },
 
+    MousePressedHandler: function(event) {
+        if (event.getButton() == cc.EventMouse.BUTTON_LEFT) {
+            this.Fire(
+                this.fluttershy_sprite.x,
+                this.fluttershy_sprite.y
+                );
+        };
+    },
+
+    MouseMoveHandler: function(event) {
+        this.fluttershy_sprite.y = event.getLocationY();
+    },
+
+    SetMouseRunningHandlers: function() {
+        if (cc.sys.capabilities.hasOwnProperty("mouse")) {
+            cc.eventManager.addListener({
+                event: cc.EventListener.MOUSE,
+
+                onMouseDown: this.MousePressedHandler.bind(this),
+
+                onMouseMove: this.MouseMoveHandler.bind(this)
+            },
+            this);
+        };
+    },
+
+    SetMouseIdleHandlers: function() {
+        if (cc.sys.capabilities.hasOwnProperty("mouse")) {
+            cc.eventManager.addListener({
+                event: cc.EventListener.MOUSE,
+
+                onMouseDown: null,
+
+                onMouseMove: null
+            },
+            this);
+        };
+    },
+
     PlayBackgroundMusic: function() {
         cc.audioEngine.playMusic(res.Background_music, true);
         cc.audioEngine.setMusicVolume(0.0);
@@ -323,6 +364,11 @@ var PonyInvandersMainLayer = cc.Layer.extend({
             }, 
             this);
         };
+
+        /*
+            SETUP MOUSE
+        */
+        this.SetMouseIdleHandlers();
 
         /*
             INIT CIGAN'S ANIMATION
@@ -425,4 +471,3 @@ var MainScene = cc.Scene.extend({
         // this.addChild(tl);
     }
 });
-
